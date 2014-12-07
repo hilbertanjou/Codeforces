@@ -1,0 +1,95 @@
+#include<bits/stdc++.h>
+using namespace std;
+void open()
+{
+	freopen("painting.in","r",stdin);
+	freopen("painting.out","w",stdout);
+}
+
+char s[1010][1010];
+int rows[1010][1010],cols[1010][1010];
+int n,m,fx,fy,lx,ly,total;
+void read()
+{
+	scanf("%d%d",&n,&m);
+	for(int i=1;i<=n;++i)
+		scanf("%s",s[i]+1);
+	for(int i=1;i<=n;++i)for(int j=1;j<=m;++j)total+= s[i][j]=='X';
+	for(int i=1;i<=n;++i)
+		for(int j=1;j<=m;++j)
+			if(s[i][j]=='X')
+			{
+				// cout<<i<<" "<<j<<" "<<s[i][j]<<endl;
+				fx=i;fy=j;goto br1;
+			}
+	br1:
+	for(int i=1;i<=m;++i)
+		for(int j=1;j<=n;++j)
+			if(s[j][i]=='X')
+			{
+				// cout<<fx<<" "<<fy<<" "<<j<<" "<<i<<endl;
+				if(fx!=j || fy!=i){printf("-1\n");exit(0);}
+				goto br2;
+			}
+	br2:
+	for(int i=1;i<=n;++i)
+		for(int j=1;j<=m;++j)
+			rows[i][j]=rows[i][j-1]+(s[i][j]=='X');
+	for(int i=1;i<=m;++i)
+		for(int j=1;j<=n;++j)
+			cols[j][i]=cols[j-1][i]+(s[j][i]=='X');
+	// for(int i=1;i<=n;++i,printf("\n"))
+	// 	for(int j=1;j<=m;++j)printf("%3d",rows[i][j]);
+	// printf("\n");
+	// for(int i=1;i<=n;++i,printf("\n"))
+	// 	for(int j=1;j<=m;++j)printf("%3d",cols[i][j]);
+	
+}
+
+int ax,ay,area;
+bool DFS(int x,int y)
+{
+	// printf("x=%d y=%d\n",x,y);
+	int px=x+lx,py=y+ly;
+	// if(rows[px][py-1]-rows[px][y-1]!=ly && rows[px][py-1]-rows[px][y-1]!=0)return 0;
+	// if(x==ax && y==ay)printf("live\n");
+	// if(cols[px-1][py]-cols[x-1][py]!=lx && cols[px-1][py]-cols[x-1][py]!=0)return 0;
+	// if(x==ax && y==ay)printf("live\n");
+	// if(rows[x-1][py-1]-rows[x-1][y-1]!=0 && cols[px-1][y-1]-cols[x-1][y-1]!=0)return 0;
+	// if(cols[px-1][y-1]-cols[x-1][y-1]!=0)return 0;
+	// if(rows[px][py-1]-rows[px][y-1]==ly && cols[px-1][py]-cols[x-1][py]==lx)return 0;
+	if(rows[px][py-1]-rows[px][y-1]==ly){area+=ly;return DFS(x+1,y);}
+	if(cols[px-1][py]-cols[x-1][py]==lx){area+=lx;return DFS(x,y+1);}
+	return 1;
+}
+
+int unravel=1e9;
+
+void work()
+{
+	ax=3,ay=1;
+	int nx,ny;
+	for(nx=1;s[fx+nx][fy]=='X';++nx);
+	lx=nx;
+	for(ly=1;s[fx][fy+ly-1]=='X';++ly)
+	{
+		area=lx*ly;DFS(fx,fy);
+		if(area==total)unravel=min(unravel,lx*ly);
+	}
+	for(ny=1;s[fx][fy+ny]=='X';++ny);
+	ly=ny;
+	for(lx=1;s[fx+lx-1][fy]=='X';++lx)
+	{
+		area=lx*ly;DFS(fx,fy);
+		if(area==total)unravel=min(unravel,lx*ly);
+	}
+	cout<<(unravel==1e9 ? -1 : unravel)<<endl;
+}
+
+int main()
+{
+	// open();
+	read();
+	work();
+	return 0;
+}
